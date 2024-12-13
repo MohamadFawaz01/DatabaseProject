@@ -1,0 +1,98 @@
+.Navbar {
+    padding: 20px 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Navbar .logo {
+    width: 100px;
+}
+
+.Navbar-menu {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+}
+
+.Navbar-menu a {
+    text-decoration: none;
+    font-size: 38px;
+    color: black;
+    font-family: 'Great Vibes', cursive;
+}
+
+.Navbar-menu a.active {
+    
+    padding-bottom: 2px;
+    color:#bc0909;
+    border-bottom: 2px solid black;
+}
+
+.Navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.Navbar-search_icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.Navbar-search_icon .dot {
+    position: absolute;
+    min-width: 10px;
+    min-height: 10px;
+    background-color: #bc0909;
+    border-radius: 5px;
+    top: -8px;
+    right: -8px;
+}
+
+.Navbar button {
+    background: transparent;
+    font-size: 16px;
+    color: #bc0909;
+    border: 1px solid black;
+    padding: 10px 30px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.Navbar button:hover {
+    transform: scale(1.1);
+    transition: 0.5s;
+}
+
+.Navbar .login-button.active {
+    background-color: #ff0000; /* Example color */
+    color: white;
+}
+
+.Navbar li {
+    cursor: pointer;
+}
+
+.Navbar-search_icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.Navbar-search_icon .dot {
+    position: absolute;
+    min-width: 10px;
+    min-height: 10px;
+    background-color: #bc0909;
+    border-radius: 5px;
+    top: -8px;
+    right: -8px;
+}
+
+/* Additional responsive styles */
+html {
+    scroll-behavior: smooth;
+}

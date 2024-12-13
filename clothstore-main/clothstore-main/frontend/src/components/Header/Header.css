@@ -1,0 +1,83 @@
+.header {
+  height: 34vw;
+  margin: 30px auto;
+  background: url('../../assets/header_img2.png') no-repeat center center;
+  background-size: cover;
+  position: relative;
+}
+
+.header-contents {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 1.5vw;
+  max-width: 50%;
+  bottom: 10%;
+  left: 6vw;
+  animation: fadeIn 3s;
+}
+
+.header-contents h2 {
+display: none;
+}
+
+.header-contents p {
+display: none;
+}
+
+.header-contents button {
+  border: none;
+  color: #bc0909;
+  font-weight: 500;
+  padding: 1vw 2.3vw;
+  background-color: white;
+  font-size: max(1vw, 13px);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.header-contents button:hover {
+  background-color: white; /* Keep the same color */
+  transform: scale(1.1); /* Slightly increase the size */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a shadow for depth */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (max-width: 1050px) {
+  .header-contents {
+      max-width: 45%;
+  }
+}
+
+@media (max-width: 750px) {
+  .header-contents {
+      max-width: 65%;
+  }
+  .header-contents p {
+      display: none;
+  }
+  .header-contents button {
+      padding: 2vw 4vw;
+  }
+  .header{
+      height: 34vw;
+      margin: 10px auto;
+      
+  }
+  .header-contents button{
+      border: none;
+      color: #bc0909;
+      font-weight: 500;
+      padding: 0.5vw 2vw;
+      background-color: white;
+      font-size: max(1vw, 11px);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+  } 
+}
