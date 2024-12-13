@@ -117,7 +117,8 @@
 
 // export default App;
 
-import { useState, React } from "react";
+import { useState, React, useEffect } from "react";
+import api from "./api"; // the connector to the backend
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Navbar from "./components/Navbar/Navbar";
