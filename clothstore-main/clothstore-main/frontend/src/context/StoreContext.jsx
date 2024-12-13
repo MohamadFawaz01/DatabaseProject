@@ -1,7 +1,7 @@
 // StoreContext.jsx
 import React, { createContext, useState, useEffect } from 'react';
 import { food_list } from '../assets/assets';
-//nothing
+
 export const StoreContext = createContext(null);
 
 const getDefaultCart = () => {
