@@ -117,27 +117,40 @@
 
 // export default App;
 
-import { useState, React, useEffect } from "react";
-import api from "./api"; // the connector to the backend
+import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Navbar from "./components/Navbar/Navbar";
-import "./App.css";
 import Footer from "./components/Footer/Footer";
+import "./App.css";
+
+// Import the StoreContextProvider and LoginPopup
+import StoreContextProvider from "./context/StoreContext";
+import LoginPopup from "./components/LoginPopup/LoginPopup";
 
 const App = () => {
-  const [count, setCount] = useState(0);
+  const [showLogin, setShowLogin] = useState(false);
 
   return (
-    <>
+    <StoreContextProvider>
       <div className="app">
         <Navbar />
+        {/* A temporary login button to open the login popup */}
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <button onClick={() => setShowLogin(true)}>
+            Login / Register
+          </button>
+        </div>
+
         <Routes>
           <Route path="/" element={<Home />} />
         </Routes>
       </div>
       <Footer />
-    </>
+
+      {/* Conditionally render the LoginPopup */}
+      {showLogin && <LoginPopup setShowLogin={setShowLogin} />}
+    </StoreContextProvider>
   );
 };
 

@@ -16,6 +16,14 @@ const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState(getDefaultCart());
   const [foodInfo, setFoodInfo] = useState('');
   const [token, setToken] = useState('');
+  const url = "http://localhost:8000"; // Assuming your FastAPI server runs here
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
 
   const addToCart = (itemId) => {
     setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
@@ -39,13 +47,6 @@ const StoreContextProvider = (props) => {
     return totalAmount;
   };
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
-    }
-  }, []);
-
   const contextValue = {
     food_list,
     cartItems,
@@ -56,6 +57,7 @@ const StoreContextProvider = (props) => {
     setToken,
     foodInfo,
     setFoodInfo,
+    url
   };
 
   return (
