@@ -14,7 +14,6 @@ const Navbar = ({ setShowLogin }) => {
     if (location.hash) {
       const element = document.getElementById(location.hash.substring(1));
       if (element) {
-        // Adding a slight delay to ensure the element is in the DOM
         setTimeout(() => {
           element.scrollIntoView({ behavior: "smooth" });
         }, 100);
@@ -34,7 +33,6 @@ const Navbar = ({ setShowLogin }) => {
     <div className='Navbar'>
       <Link to='/'><img src={assets.new_logo} alt="" className="logo" /></Link>
       
-      {/* Only display Navbar-menu if not on the /Inmenu page */}
       {!isInmenuPage && (
         <ul className="Navbar-menu">
           <Link to='/' onClick={() => setMenu("home")} className={menu === "home" ? "active" : ""}>home</Link>
