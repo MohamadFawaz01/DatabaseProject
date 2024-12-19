@@ -2,6 +2,7 @@ import basket_icon from './basket_icon.png'
 import new_logo from './new_logo.jpg'
 import profile_icon from './profile_icon.png'
 import logo from './logo.jpg'
+import cross_icon from './cross_icon.png'
 import bag_icon from './bag_icon.png'
 import logout_icon from './logout_icon.png'
 import searchIcon from './searchicon.png'
@@ -49,6 +50,7 @@ import GS from './Greek_salad.jpg'
 export const assets ={
     new_logo,
     logo,
+    cross_icon,
     add_icon_white,
     remove_icon_red,
     add_icon_green,

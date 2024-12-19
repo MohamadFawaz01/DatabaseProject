@@ -1,19 +1,18 @@
-from sqlalchemy import Column, Integer, String, BigInteger, ForeignKey, Date, Boolean, Float
+from sqlalchemy import Column, Integer, String, BigInteger, ForeignKey, Date
 from sqlalchemy.orm import relationship
-from database import Base  # Replace with your actual Base import
-
+from database import Base
 
 class FoodItem(Base):
     __tablename__ = 'food_items'
 
     food_id = Column(Integer, primary_key=True)
-    name = Column(String(50))  # Specify length
+    name = Column(String(50))
     price = Column(Integer)
-    description = Column(String(200))  # Specify length
+    description = Column(String(200))
     category_id = Column(Integer, ForeignKey('categories.category_id'))
     price_to_make = Column(Integer)
-    photo = Column(String(255))  # Specify length
-    
+    photo = Column(String(255))
+
     category = relationship("Category", back_populates="food_items")
     feedbacks = relationship("Feedback", back_populates="food_item")
     order_details = relationship("OrderDetails", back_populates="food_item")
@@ -26,7 +25,7 @@ class Feedback(Base):
     stars = Column(Integer)
     user_id = Column(BigInteger, ForeignKey('users.user_id'))
     food_id = Column(Integer, ForeignKey('food_items.food_id'))
-    comment = Column(String(500))  # Specify length
+    comment = Column(String(500))
 
     user = relationship("User", back_populates="feedbacks")
     food_item = relationship("FoodItem", back_populates="feedbacks")
@@ -36,10 +35,10 @@ class User(Base):
     __tablename__ = 'users'
 
     user_id = Column(BigInteger, primary_key=True)
-    username = Column(String(100), unique=True)  # Specify length
-    phone_number = Column(String(8))  # Specify length for phone numbers
-    password = Column(String(255),nullable=False)  # Specify length for password hashes
-    address = Column(String(255))  # Specify length for address
+    username = Column(String(100), unique=True)
+    phone_number = Column(String(8))
+    password = Column(String(255), nullable=False)
+    address = Column(String(255))
 
     feedbacks = relationship("Feedback", back_populates="user")
     orders = relationship("Orders", back_populates="user")
@@ -50,10 +49,10 @@ class Orders(Base):
 
     order_id = Column(BigInteger, primary_key=True)
     user_id = Column(BigInteger, ForeignKey('users.user_id'))
-    promo_code = Column(String(50), ForeignKey('promo_codes.code'))  # Specify length
+    promo_code = Column(String(50), ForeignKey('promo_codes.code'))
     total_food_price = Column(Integer)
     delivery_fee = Column(Integer)
-    status = Column(String(50))  # Specify length
+    status = Column(String(50))
     order_date = Column(Date)
     payment_id = Column(BigInteger, ForeignKey('payments.payment_id'))
 
@@ -87,7 +86,7 @@ class Stats(Base):
 class ItemOfMonth(Base):
     __tablename__ = 'item_of_month'
 
-    month = Column(String(20), primary_key=True)  # Specify length
+    month = Column(String(20), primary_key=True)
     plate_of_month = Column(Integer, ForeignKey('food_items.food_id'))
 
     plate_of_month_item = relationship("FoodItem")
@@ -97,17 +96,17 @@ class Admin(Base):
     __tablename__ = 'admins'
 
     admin_id = Column(Integer, primary_key=True)
-    username = Column(String(100))  # Specify length
-    password = Column(String(255))  # Specify length
+    username = Column(String(100))
+    password = Column(String(255))
 
 
 class Payment(Base):
     __tablename__ = 'payments'
 
     payment_id = Column(BigInteger, primary_key=True)
-    payment_method = Column(String(50))  # Specify length
-    payment_status = Column(String(50))  # Specify length
-    transaction_id = Column(String(100))  # Specify length
+    payment_method = Column(String(50))
+    payment_status = Column(String(50))
+    transaction_id = Column(String(100))
 
     orders = relationship("Orders", back_populates="payment")
 
@@ -115,7 +114,7 @@ class Payment(Base):
 class PromoCode(Base):
     __tablename__ = 'promo_codes'
 
-    code = Column(String(50), primary_key=True)  # Specify length
+    code = Column(String(50), primary_key=True)
     discount = Column(Integer)
     valid_from = Column(Date)
     valid_to = Column(Date)
@@ -125,8 +124,8 @@ class Category(Base):
     __tablename__ = 'categories'
 
     category_id = Column(Integer, primary_key=True)
-    category_name = Column(String(100))  # Specify length
-    addons = Column(String(200))  # Specify length
-    removable_items = Column(String(200))  # Specify length
+    category_name = Column(String(100))
+    addons = Column(String(200))
+    removable_items = Column(String(200))
 
     food_items = relationship("FoodItem", back_populates="category")
