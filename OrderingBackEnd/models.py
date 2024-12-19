@@ -7,7 +7,7 @@ class FoodItem(Base):
     __tablename__ = 'food_items'
 
     food_id = Column(Integer, primary_key=True)
-    name = Column(String(50))  # Specify length
+    name = Column(String(50), unique=True)  # Specify length
     price = Column(Integer)
     description = Column(String(200))  # Specify length
     category_id = Column(Integer, ForeignKey('categories.category_id'))
@@ -130,3 +130,7 @@ class Category(Base):
     removable_items = Column(String(200))  # Specify length
 
     food_items = relationship("FoodItem", back_populates="category")
+
+
+
+
