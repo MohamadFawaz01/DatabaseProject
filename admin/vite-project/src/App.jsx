@@ -6,6 +6,7 @@ import Login from "./pages/Login/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PromoCode from "./components/PromoCode/PromoCode";
+import Add from "./pages/Add/Add"; // Import the Add component
 
 const App = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const App = () => {
         <Routes>
           <Route path="/login" element={<Login url={url} />} />
           <Route path="/promocodes" element={<PromoCode url={url} />} />
+          <Route path="/add" element={<Add url={url} />} />
         </Routes>
       </div>
     </div>

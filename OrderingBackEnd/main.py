@@ -1,6 +1,7 @@
 from multiprocessing import get_context
+import os
 import bcrypt
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, Form, HTTPException, Depends, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Annotated, List, Optional
@@ -9,11 +10,14 @@ from sqlalchemy.orm import Session
 from datetime import date, datetime, timedelta
 import models
 from database import SessionLocal, engine
+from fastapi.staticfiles import StaticFiles
 
 # Create the database tables if they don't exist
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"),name="static")
 
 # CORS configuration
 app.add_middleware(
@@ -95,46 +99,70 @@ async def login_user(user: LoginRequest, db: db_dependency):
         "message": f"Welcome, {db_user.username}!"
     }
 
+
+
+# add food item in the menu 
 class FoodItemCreate(BaseModel):
     name: str
     price: int
     description: str
-    category_id: int
+    category_name: str
     price_to_make: int
     photo: str
 
+# Endpoint to create a food item
 @app.post("/fooditems/", status_code=status.HTTP_201_CREATED)
-async def create_food_item(food_item: FoodItemCreate, db: Session = Depends(get_db)):
+async def create_food_item(
+    name: str = Form(...),
+    price: int = Form(...),
+    description: str = Form(...),
+    category_name: str = Form(...),
+    price_to_make: int = Form(...),
+    photo: UploadFile = Form(...),
+    db: Session = Depends(get_db),
+):
+    # Check if the food item name already exists
+    existing_food_item = db.query(models.FoodItem).filter(models.FoodItem.name == name).first()
+    if existing_food_item:
+        raise HTTPException(status_code=400, detail="A food item with this name already exists.")
     
-        # Check if the food item name already exists
-        existing_food_item = db.query(models.FoodItem).filter(models.FoodItem.name == food_item.name).first()
-        if existing_food_item:
-            raise HTTPException(status_code=400, detail="A food item with this name already exists.")
-
-        # Create a new FoodItem instance
-        db_food_item = models.FoodItem(
-            name=food_item.name,
-            price=food_item.price,
-            description=food_item.description,
-            category_id=food_item.category_id,
-            price_to_make=food_item.price_to_make,
-            photo=food_item.photo
-        )
-
-        db.add(db_food_item)
-        db.commit()
-        db.refresh(db_food_item)
-
-        return {
-            "food_id": db_food_item.food_id,
-            "name": db_food_item.name,
-            "price": db_food_item.price,
-            "description": db_food_item.description,
-            "category_id": db_food_item.category_id,
-            "price_to_make": db_food_item.price_to_make,
-            "photo": db_food_item.photo,
-        }
-
+    # Validate and save the uploaded file
+    file_extension = os.path.splitext(photo.filename)[1].lower()
+    if file_extension not in [".jpg", ".jpeg", ".png"]:
+        raise HTTPException(status_code=400, detail="Invalid file type. Only JPG, JPEG, and PNG are allowed.")
+    
+    # Sanitize the file name
+    sanitized_name = name.replace(" ", "_")
+    file_name = f"{sanitized_name}.jpg"
+    file_path = f"static/images/{file_name}"
+    
+    with open(file_path, "wb") as file:
+        content = await photo.read()
+        file.write(content)
+    
+    # Create a new FoodItem instance
+    db_food_item = models.FoodItem(
+        name=name,
+        price=price,
+        description=description,
+        category_name=category_name,
+        price_to_make=price_to_make,
+        photo=f"images/{file_name}",  # Save only the relative path
+    )
+    
+    db.add(db_food_item)
+    db.commit()
+    db.refresh(db_food_item)
+    
+    return {
+        "food_id": db_food_item.food_id,
+        "name": db_food_item.name,
+        "price": db_food_item.price,
+        "description": db_food_item.description,
+        "category_name": db_food_item.category_name,
+        "price_to_make": db_food_item.price_to_make,
+        "photo": db_food_item.photo,
+    }
 
 
 #getting all fooditems from the database to show them for the admin
@@ -144,7 +172,7 @@ class FoodItemResponse(BaseModel):
     name: str
     price: int
     description: str
-    category_id: int
+    category_name: str
     price_to_make: int
     photo: str
 

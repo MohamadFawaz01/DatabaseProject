@@ -9,7 +9,7 @@ class FoodItem(Base):
     name = Column(String(50), unique=True)  # Specify length
     price = Column(Integer)
     description = Column(String(200))
-    category_id = Column(Integer, ForeignKey('categories.category_id'))
+    category_name = Column(Integer, ForeignKey('categories.category_name'))
     price_to_make = Column(Integer)
     photo = Column(String(255))
 
@@ -123,8 +123,7 @@ class PromoCode(Base):
 class Category(Base):
     __tablename__ = 'categories'
 
-    category_id = Column(Integer, primary_key=True)
-    category_name = Column(String(100))
+    category_name = Column(String(100), primary_key=True)
     addons = Column(String(200))
     removable_items = Column(String(200))
 
