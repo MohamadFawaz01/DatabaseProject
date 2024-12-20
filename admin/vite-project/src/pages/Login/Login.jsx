@@ -15,12 +15,14 @@ const Login = ({ url }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting login request to:", `${url}/api/admin/login`);
 
     try {
       const response = await axios.post(`${url}/api/admin/login`, {
         username,
         password,
       });
+
       if (response.data.success) {
         localStorage.setItem("token", response.data.token); // Store the token
         navigate("/orders"); // Redirect to the orders page
@@ -29,7 +31,22 @@ const Login = ({ url }) => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("An error occurred. Please try again.");
+
+      // Handle network errors
+      if (error.response) {
+        // Server responded with a status code out of 2xx range
+        alert(
+          `Error ${error.response.status}: ${
+            error.response.data.detail || "Unknown error"
+          }`
+        );
+      } else if (error.request) {
+        // Request was made, but no response received
+        alert("No response from server. Please check your connection.");
+      } else {
+        // Other errors
+        alert("An unexpected error occurred. Please try again.");
+      }
     }
   };
 

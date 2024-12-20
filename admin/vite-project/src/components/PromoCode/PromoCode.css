@@ -1,41 +1,62 @@
+PromoCode.css
+
+/* Page Container */
 .promo-code-page {
-    padding: 20px;
-    max-width: 500px;
-    margin: auto;
-  }
-  
-  .promo-code-page h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .form-group {
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-group label {
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  
-  .form-group input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .submit-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    width: 100%;
-  }
-  
-  .submit-button:hover {
-    background-color: #0056b3;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Align the form to the top */
+  background-color: #ffffff; /* Bright white background */
+  padding: 20px 0; /* Space between the form and the edges */
+  min-height: 100vh; /* Ensure the page covers full height */
+}
+
+/* Form Container */
+form {
+  width: 100%;
+  max-width: 500px; /* Restrict form width */
+  background-color: #ffffff; /* Bright white for the form */
+  padding: 20px;
+  margin-top: 20px; /* Add some spacing below the header */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 15px;
+}
+
+/* Form Labels */
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 14px;
+  color: #333; /* Darker text color */
+}
+
+/* Form Inputs */
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Submit Button */
+.submit-button {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: darkred;
+}

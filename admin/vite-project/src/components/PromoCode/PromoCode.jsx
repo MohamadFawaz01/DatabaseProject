@@ -98,10 +98,67 @@ const PromoCode = ({ url }) => {
             required
           />
         </div>
-        <button type="submit" className="submit-button">Create Promo Code</button>
+        <button type="submit" className="submit-button">
+          Create Promo Code
+        </button>
       </form>
     </div>
   );
 };
 
 export default PromoCode;
+
+// return (
+//   <div className="promo-code-page">
+//     <h2>Create Promo Code</h2>
+//     <form onSubmit={handleSubmit}>
+//       <div className="form-group">
+//         <label htmlFor="code">Code:</label>
+//         <input
+//           type="text"
+//           id="code"
+//           name="code"
+//           value={formData.code}
+//           onChange={handleChange}
+//           required
+//         />
+//       </div>
+//       <div className="form-group">
+//         <label htmlFor="discount">Discount (%):</label>
+//         <input
+//           type="number"
+//           id="discount"
+//           name="discount"
+//           value={formData.discount}
+//           onChange={handleChange}
+//           required
+//         />
+//       </div>
+//       <div className="form-group">
+//         <label htmlFor="valid_from">Valid From:</label>
+//         <input
+//           type="date"
+//           id="valid_from"
+//           name="valid_from"
+//           value={formData.valid_from}
+//           onChange={handleChange}
+//           required
+//         />
+//       </div>
+//       <div className="form-group">
+//         <label htmlFor="valid_to">Valid To:</label>
+//         <input
+//           type="date"
+//           id="valid_to"
+//           name="valid_to"
+//           value={formData.valid_to}
+//           onChange={handleChange}
+//           required
+//         />
+//       </div>
+//       <button type="submit" className="submit-button">
+//         Create Promo Code
+//       </button>
+//     </form>
+//   </div>
+// );
