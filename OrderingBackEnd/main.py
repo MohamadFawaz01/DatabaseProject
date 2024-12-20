@@ -1,7 +1,7 @@
 from multiprocessing import get_context
 import os
 import bcrypt
-from fastapi import FastAPI, Form, HTTPException, Depends, UploadFile, status
+from fastapi import FastAPI, File, Form, HTTPException, Depends, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Annotated, List, Optional
@@ -118,7 +118,7 @@ async def create_food_item(
     description: str = Form(...),
     category_name: str = Form(...),
     price_to_make: int = Form(...),
-    photo: UploadFile = Form(...),
+    photo: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
     # Check if the food item name already exists
@@ -147,7 +147,7 @@ async def create_food_item(
         description=description,
         category_name=category_name,
         price_to_make=price_to_make,
-        photo=f"images/{file_name}",  # Save only the relative path
+        photo=f"/images/{file_name}",  # Save only the relative path
     )
     
     db.add(db_food_item)
