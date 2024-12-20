@@ -7,6 +7,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PromoCode from "./components/PromoCode/PromoCode";
 import Add from "./pages/Add/Add"; // Import the Add component
+import List from "./pages/List/List"; // Import the List component
+import Orders from "./pages/Orders/Orders";
 
 const App = () => {
   const navigate = useNavigate();
@@ -30,6 +32,9 @@ const App = () => {
           <Route path="/login" element={<Login url={url} />} />
           <Route path="/promocodes" element={<PromoCode url={url} />} />
           <Route path="/add" element={<Add url={url} />} />
+          <Route path="/list" element={<List url={url} />} />{" "}
+          <Route path="/orders" element={<Orders url={url} />} />
+          {/* Add the List route */}
         </Routes>
       </div>
     </div>

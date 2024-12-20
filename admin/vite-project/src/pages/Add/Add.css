@@ -32,7 +32,9 @@
   max-width: 120px;
   border: none;
   padding: 10px;
-  background-color: black;
+  margin-top: 9px;
+  padding-top: 5px;
+  background-color: red;
   color: white;
   cursor: pointer;
 }

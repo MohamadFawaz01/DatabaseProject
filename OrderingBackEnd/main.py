@@ -176,11 +176,26 @@ class FoodItemResponse(BaseModel):
     price_to_make: int
     photo: str
 
-@app.get("/fooditems/", response_model=List[FoodItemResponse])
+    class Config:
+        orm_mode = True
+
+@app.get("/api/food/list", response_model=dict)
 def get_all_food_items(db: Session = Depends(get_db)):
-    # Query all food items from the database
     food_items = db.query(models.FoodItem).all()
-    return food_items
+    food_items_response = [
+        FoodItemResponse(
+            food_id=item.food_id,
+            name=item.name,
+            price=item.price,
+            description=item.description,
+            category_name=item.category_name or "Unknown",  # Default to "Unknown" if None
+            price_to_make=item.price_to_make,
+            photo=item.photo,
+        )
+        for item in food_items
+    ]
+    return {"success": True, "data": food_items_response}
+
 
 
 #delete food item from the database

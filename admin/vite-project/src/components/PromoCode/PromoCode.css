@@ -11,6 +11,12 @@ PromoCode.css
   min-height: 100vh; /* Ensure the page covers full height */
 }
 
+.promo-code-page h2 {
+  position: relative;
+  top: -700px;
+  right: -280px;
+}
+
 /* Form Container */
 form {
   width: 100%;
@@ -20,6 +26,9 @@ form {
   margin-top: 20px; /* Add some spacing below the header */
   border-radius: 8px; /* Rounded corners */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+  position: relative;
+  top: -700px;
+  right: -270px;
 }
 
 /* Form Groups */
@@ -59,4 +68,39 @@ input {
 
 .submit-button:hover {
   background-color: darkred;
+}
+
+@media (max-width: 1028px) {
+  form {
+    width: 100%;
+    max-width: 500px; /* Restrict form width */
+    background-color: #ffffff; /* Bright white for the form */
+    padding: 20px;
+    margin-top: 20px; /* Add some spacing below the header */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+    position: relative;
+    top: -700px;
+    right: -170px;
+  }
+  .promo-code-page h2 {
+    position: relative;
+    top: -700px;
+    right: -170px;
+  }
+}
+
+@media (max-width: 750px) {
+  form {
+    width: 100%;
+    max-width: 500px; /* Restrict form width */
+    background-color: #ffffff; /* Bright white for the form */
+    padding: 20px;
+    margin-top: 20px; /* Add some spacing below the header */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+    position: relative;
+    top: -700px;
+    right: -170px;
+  }
 }

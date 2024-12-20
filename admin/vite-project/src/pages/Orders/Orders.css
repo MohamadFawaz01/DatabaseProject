@@ -1,0 +1,82 @@
+.orders-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  position: relative;
+  top: -710px;
+  right: -250px;
+}
+
+.orders-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.orders-title p {
+  position: relative;
+  top: -10px;
+  right: 620px;
+}
+
+.orders-table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.orders-table-header {
+  display: flex;
+  background-color: #f4f4f4;
+  padding: 10px;
+  font-weight: bold;
+  text-align: left;
+}
+
+.orders-table-header b {
+  flex: 1;
+}
+
+.orders-table-row {
+  display: flex;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.orders-table-row p {
+  flex: 1;
+  margin: 0;
+}
+
+.orders-table-row:last-child {
+  border-bottom: none;
+}
+
+.delete-button {
+  color: red;
+  cursor: pointer;
+  text-decoration: underline;
+  text-align: center;
+}
+.delete-button:hover {
+  text-decoration: none;
+  color: darkred;
+}
+
+@media (max-width: 1028px) {
+  .orders-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    position: relative;
+    top: -710px;
+    right: -120px;
+  }
+
+  .orders-title p {
+    position: relative;
+    top: -10px;
+    right: 290px;
+  }
+}
