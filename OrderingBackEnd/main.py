@@ -1,3 +1,4 @@
+from multiprocessing import get_context
 import bcrypt
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,7 +17,8 @@ app = FastAPI()
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Frontend URL
+    allow_origins=["http://localhost:5173",
+                   "http://localhost:5174"],  # Frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -230,3 +232,37 @@ def create_promo_code(promo_code: PromoCodeCreate, db: Session = Depends(get_db)
     db.add(db_promo)
     db.commit()
     db.refresh(db_promo)
+
+
+# Pydantic model for login request
+class AdminLoginRequest(BaseModel):
+    username: str
+    password: str
+
+# Pydantic model for login response
+class AdminLoginResponse(BaseModel):
+    success: bool
+    message: str
+    token: str | None = None
+
+
+@app.post("/api/admin/login", response_model=AdminLoginResponse, status_code=status.HTTP_200_OK)
+def login_admin(login_request: AdminLoginRequest, db: Session = Depends(get_db)):
+    """
+    Admin login that retrieves credentials from the database without password hashing.
+    """
+    # Query the database for the user
+    admin_user = db.query(models.Admin).filter(models.Admin.username == login_request.username).first()
+    
+    if not admin_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password")
+
+    # Compare passwords directly (plaintext)
+    if login_request.password != admin_user.password:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password")
+    
+    # Generate token (replace with proper JWT token generation)
+    token = "dummy-token-for-now"
+
+    return AdminLoginResponse(success=True, message="Login successful", token=token)
+
