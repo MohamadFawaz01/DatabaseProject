@@ -1,0 +1,38 @@
+.navbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 4%;
+}
+
+.navbar .logo{
+    width: max(15%,80px);
+}
+
+.navbar .profile-section {
+    display: flex;
+    align-items: center;
+}
+
+.navbar .profile{
+    border-radius: 50px;
+    height: 55px;
+    width: 55px;
+    margin-right: 10px; /* Adds some space between the profile image and the button */
+}
+
+.navbar .logout-button {
+    background: transparent;
+    font-size: 16px;
+    color: #bc0909;
+    border: 1px solid black;
+    padding: 10px 30px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.navbar .logout-button:hover {
+    background-color: rgb(49, 45, 45);
+    transition: 0.5s;
+}
