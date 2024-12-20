@@ -3,8 +3,9 @@ from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Annotated, List, Optional
+from sqlalchemy import func
 from sqlalchemy.orm import Session
-from datetime import date
+from datetime import date, datetime, timedelta
 import models
 from database import SessionLocal, engine
 
@@ -230,3 +231,159 @@ def create_promo_code(promo_code: PromoCodeCreate, db: Session = Depends(get_db)
     db.add(db_promo)
     db.commit()
     db.refresh(db_promo)
+
+#delete order from database cancel order
+
+@app.delete("/orders/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_order(order_id: int, db: Session = Depends(get_db)):
+    # Retrieve the order from the database
+    order = db.query(models.Orders).filter(models.Orders.order_id == order_id).first()
+
+    # If the order does not exist, raise a 404 error
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Order with ID {order_id} not found."
+        )
+
+    # Delete the order from the database
+    db.delete(order)
+    db.commit()
+
+    return {"message": f"Order with ID {order_id} has been deleted successfully"}
+
+
+
+# list all the orders in the database
+class OrderResponse(BaseModel):
+    order_id: int
+    user_id: int
+    promo_code: Optional[str]
+    total_food_price: int
+    delivery_fee: int
+    status: str
+    order_date: date
+    payment_id: Optional[int]
+
+    class Config:
+        orm_mode = True  # Enable ORM-to-JSON conversion
+
+
+@app.get("/orders/", response_model=List[OrderResponse])
+def list_all_orders(db: Session = Depends(get_db)):
+    # Query all orders from the database
+    orders = db.query(models.Orders).all()
+    return orders
+
+
+# get the best seller item from the last 7 days based on the order details table data
+@app.get("/best-seller/")
+def get_best_seller(db: Session = Depends(get_db)):
+    # Calculate the date 7 days ago
+    seven_days_ago = datetime.now().date() - timedelta(days=7)
+
+    # Query to get the total quantity of each food item sold in the last 7 days
+    best_seller_query = (
+        db.query(
+            models.OrderDetails.food_id,
+            func.sum(models.OrderDetails.quantity).label("total_quantity")
+        )
+        .join(models.Orders, models.OrderDetails.order_id == models.Orders.order_id)
+        .filter(models.Orders.order_date >= seven_days_ago)  # Filter by last 7 days
+        .group_by(models.OrderDetails.food_id)  # Group by food_id
+        .order_by(func.sum(models.OrderDetails.quantity).desc())  # Sort by total_quantity
+        .first()  # Get the top result
+    )
+
+    # If no items were sold in the last 7 days
+    if not best_seller_query:
+        raise HTTPException(
+            status_code=404, detail="No items sold in the last 7 days."
+        )
+
+    # Extract the best seller information
+    food_id, total_quantity = best_seller_query
+
+    # Query to get the food item details
+    food_item = db.query(models.FoodItem).filter(models.FoodItem.food_id == food_id).first()
+    if not food_item:
+        raise HTTPException(
+            status_code=404, detail=f"Food item with ID {food_id} not found."
+        )
+
+    # Return the best-seller details
+    return {
+        "food_id": food_id,
+        "name": food_item.name,
+        "total_quantity": total_quantity,
+        "description": food_item.description,
+        "price": food_item.price,
+        "photo": food_item.photo,
+    }
+
+
+@app.post("/stats/calculate-daily-net-income/", status_code=201)
+def calculate_daily_net_income(db: Session = Depends(get_db)):
+    # Get today's date
+    today = date.today()
+
+    # Query to calculate total income (sum of price * quantity)
+    total_income_query = (
+        db.query(func.sum(models.FoodItem.price * models.OrderDetails.quantity))
+        .join(models.OrderDetails, models.FoodItem.food_id == models.OrderDetails.food_id)
+        .join(models.Orders, models.OrderDetails.order_id == models.Orders.order_id)
+        .filter(models.Orders.order_date == today)  # Filter by today's date
+        .scalar()
+    )
+    total_income = total_income_query or 0  # Handle null values
+
+    # Query to calculate total cost (sum of price_to_make * quantity)
+    total_cost_query = (
+        db.query(func.sum(models.FoodItem.price_to_make * models.OrderDetails.quantity))
+        .join(models.OrderDetails, models.FoodItem.food_id == models.OrderDetails.food_id)
+        .join(models.Orders, models.OrderDetails.order_id == models.Orders.order_id)
+        .filter(models.Orders.order_date == today)  # Filter by today's date
+        .scalar()
+    )
+    total_cost = total_cost_query or 0  # Handle null values
+
+    # Calculate net income
+    net_income = total_income - total_cost
+
+    # Query to determine the plate of the day (most ordered food item)
+    plate_of_the_day_query = (
+        db.query(
+            models.OrderDetails.food_id,
+            func.sum(models.OrderDetails.quantity).label("total_quantity")
+        )
+        .join(models.Orders, models.OrderDetails.order_id == models.Orders.order_id)
+        .filter(models.Orders.order_date == today)  # Filter by today's date
+        .group_by(models.OrderDetails.food_id)  # Group by food_id
+        .order_by(func.sum(models.OrderDetails.quantity).desc())  # Sort by total_quantity
+        .first()  # Get the top result
+    )
+
+    plate_of_the_day = plate_of_the_day_query[0] if plate_of_the_day_query else None
+
+    # Create a new Stats record
+    stats_entry = models.Stats(
+        total_income=total_income,
+        net_income=net_income,
+        plate_of_the_day=plate_of_the_day
+    )
+
+    # Add and commit the new stats entry
+    db.add(stats_entry)
+    db.commit()
+    db.refresh(stats_entry)
+
+    return {
+        "message": "Daily stats calculated and stored successfully.",
+        "stats": {
+            "total_income": total_income,
+            "net_income": net_income,
+            "plate_of_the_day": plate_of_the_day
+        }
+    }
+
+
