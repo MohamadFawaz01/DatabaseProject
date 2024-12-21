@@ -17,13 +17,14 @@ const Cart = () => {
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [promoMessage, setPromoMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // For displaying login error
   const totalCartAmount = getTotalCartAmount();
 
   const hasItemsInCart = Object.values(cartItems).some(
     (quantity) => quantity > 0
   );
 
-  const navigate = useNavigate(); // Initialize navigate function
+  const navigate = useNavigate();
 
   const handlePromoCodeChange = (event) => {
     setPromoCode(event.target.value);
@@ -61,6 +62,14 @@ const Cart = () => {
       discountedAmount +
       (totalCartAmount > 0 ? 2 : 0)
     ).toFixed(2);
+  };
+
+  const handleCheckout = () => {
+    if (token) {
+      navigate("/myorders");
+    } else {
+      setErrorMessage("Please log in to proceed to checkout.");
+    }
   };
 
   return (
@@ -148,10 +157,9 @@ const Cart = () => {
           {totalCartAmount === 0 ? (
             <button>Empty basket</button>
           ) : (
-            <button onClick={() => navigate("/myorders")}>
-              Proceed to checkout
-            </button>
+            <button onClick={handleCheckout}>Proceed to checkout</button>
           )}
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
         </div>
       </div>
     </div>
