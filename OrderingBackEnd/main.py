@@ -684,3 +684,45 @@ async def complete_order(
     # Debug: Confirmation message for order completion
     print(f"Order {order.order_id} marked as completed.")
     return {"message": f"Order {order.order_id} has been successfully completed."}
+
+# Define the model for the promo code validation request
+class PromoCodeValidationRequest(BaseModel):
+    code: str
+    
+
+# Define the model for the promo code validation response
+class PromoCodeValidationResponse(BaseModel):
+    success: bool
+    discount: Optional[int] = None  # Discount percentage
+    message: str
+
+@app.post("/promocode/validate", response_model=PromoCodeValidationResponse)
+def validate_promo_code(
+    promo_request: PromoCodeValidationRequest,
+    
+    db: Session = Depends(get_db),
+):
+    # Query the database for the promo code
+    promo_code = db.query(models.PromoCode).filter(models.PromoCode.code == promo_request.code).first()
+
+    # Check if the promo code exists
+    if not promo_code:
+        return PromoCodeValidationResponse(
+            success=False,
+            message="Promo code not found."
+        )
+
+    # Check if the promo code is valid (date range)
+    current_date = date.today()
+    if not (promo_code.valid_from <= current_date <= promo_code.valid_to):
+        return PromoCodeValidationResponse(
+            success=False,
+            message="Promo code is expired or not yet valid."
+        )
+
+    # Return the discount percentage if valid
+    return PromoCodeValidationResponse(
+        success=True,
+        discount=promo_code.discount,
+        message="Promo code is valid."
+    )

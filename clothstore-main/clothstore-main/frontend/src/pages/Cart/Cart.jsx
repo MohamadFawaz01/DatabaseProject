@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const {
@@ -13,15 +14,53 @@ const Cart = () => {
     token,
   } = useContext(StoreContext);
 
-  const [foodInfo, setFoodInfoState] = useState("");
+  const [promoCode, setPromoCode] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [promoMessage, setPromoMessage] = useState("");
   const totalCartAmount = getTotalCartAmount();
 
   const hasItemsInCart = Object.values(cartItems).some(
     (quantity) => quantity > 0
   );
 
-  const handleFoodInfoChange = (event) => {
-    setFoodInfoState(event.target.value);
+  const navigate = useNavigate(); // Initialize navigate function
+
+  const handlePromoCodeChange = (event) => {
+    setPromoCode(event.target.value);
+  };
+
+  const handleApplyPromoCode = async () => {
+    try {
+      const response = await fetch(`${url}/promocode/validate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ code: promoCode }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setDiscount(data.discount);
+        setPromoMessage(`Promo code applied! ${data.discount}% off.`);
+      } else {
+        setDiscount(0);
+        setPromoMessage(data.message || "Invalid promo code.");
+      }
+    } catch (error) {
+      setPromoMessage("Error applying promo code. Please try again.");
+    }
+  };
+
+  const calculateDiscountedTotal = () => {
+    const discountedAmount = (totalCartAmount * discount) / 100;
+    return (
+      totalCartAmount -
+      discountedAmount +
+      (totalCartAmount > 0 ? 2 : 0)
+    ).toFixed(2);
   };
 
   return (
@@ -40,7 +79,6 @@ const Cart = () => {
 
         {food_list.map((item, index) => {
           if (cartItems[item.food_id] > 0) {
-            // Construct image URL in the same manner as FoodItem
             const imageUrl = `http://localhost:8000/static/${item.photo}`;
 
             return (
@@ -70,15 +108,17 @@ const Cart = () => {
 
         {hasItemsInCart && (
           <>
-            <div className="title">
-              <h3>Food Instructions</h3>
+            <div className="promo-code-section">
+              <h3>Promo Code</h3>
               <input
                 type="text"
-                placeholder="Food instructions"
-                className="food-info-input"
-                value={foodInfo}
-                onChange={handleFoodInfoChange}
+                placeholder="Enter promo code"
+                className="promo-code-input"
+                value={promoCode}
+                onChange={handlePromoCodeChange}
               />
+              <button onClick={handleApplyPromoCode}>Apply</button>
+              {promoMessage && <p className="promo-message">{promoMessage}</p>}
             </div>
             <hr />
           </>
@@ -101,16 +141,16 @@ const Cart = () => {
             <hr />
             <div className="cart-total-details">
               <b>Total</b>
-              <b>
-                ${totalCartAmount === 0 ? 0 : (totalCartAmount + 2).toFixed(2)}
-              </b>
+              <b>${calculateDiscountedTotal()}</b>
             </div>
           </div>
 
           {totalCartAmount === 0 ? (
             <button>Empty basket</button>
           ) : (
-            <button>Proceed to checkout</button>
+            <button onClick={() => navigate("/myorders")}>
+              Proceed to checkout
+            </button>
           )}
         </div>
       </div>
