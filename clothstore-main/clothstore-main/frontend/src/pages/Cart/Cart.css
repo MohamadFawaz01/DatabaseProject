@@ -1,0 +1,143 @@
+.cart {
+  margin-top: 100px;
+}
+
+.cart-items-title {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 0.5fr;
+  align-items: center;
+  color: grey;
+  font-size: max(1vw, 12px);
+}
+
+.cart-items-item {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 0.5fr;
+  align-items: center;
+  margin: 10px 0px;
+  color: black;
+}
+
+.cart-items-item img {
+  width: 50px;
+}
+
+.cart hr {
+  height: 1px;
+  background-color: #e2e2e2;
+  border: none;
+}
+
+.cart-items-item .cross {
+  cursor: pointer;
+}
+
+.cart-bottom {
+  margin-top: 80px;
+  display: flex;
+  justify-content: space-between;
+  gap: max(12vw, 20px);
+}
+
+.cart-total {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cart-total-details {
+  display: flex;
+  justify-content: space-between;
+  color: #555;
+}
+
+.cart-total hr {
+  margin: 10px 0px;
+}
+
+.cart-total button {
+  border: none;
+  color: white;
+  background-color: tomato;
+  width: max(15vw, 200px);
+  padding: 12px 0px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+@media (max-width: 750px) {
+  .cart-bottom {
+    flex-direction: column-reverse;
+  }
+
+  .title input {
+    width: 100%; /* Make input field take full width on smaller screens */
+    padding: 15px; /* Increase padding for better user experience on smaller screens */
+    font-size: 14px; /* Increase font size for better readability on smaller screens */
+  }
+}
+
+.title {
+  font-size: 15px; /* Increase font size for better readability */
+  font-weight: bold; /* Make title bold */
+  margin-top: 45px; /* Add space above the title */
+  margin-bottom: 10px; /* Add space below the title */
+  color: #333; /* Adjust color to dark grey for better contrast */
+}
+
+.title input {
+  width: 50%; /* Adjust width for desktop view */
+  padding: 10px; /* Add padding for better user experience */
+  border: 1px solid tomato; /* Light border for input */
+  border-radius: 15px; /* Rounded corners for input */
+  font-size: 17px; /* Adjust font size for better readability */
+  box-sizing: border-box; /* Ensure padding and border are included in width */
+}
+
+.title input::placeholder {
+  color: #aaa; /* Placeholder text color */
+}
+/* Modal Styling */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 300px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.modal-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-close {
+  margin-top: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #555;
+}

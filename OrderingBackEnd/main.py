@@ -466,4 +466,221 @@ def calculate_daily_net_income(db: Session = Depends(get_db)):
         }
     }
 
+class AddToCartRequest(BaseModel):
+    food_id: int
+    quantity: int
+    user_id: int
 
+@app.post("/cart/add", status_code=status.HTTP_201_CREATED)
+async def add_to_cart(
+    cart_item: AddToCartRequest,
+    db: Session = Depends(get_db),
+):
+    user_id = cart_item.user_id  # Extract user_id from request body
+
+    # Fetch the user's active order (status: "pending")
+    order = db.query(models.Orders).filter(
+        models.Orders.user_id == user_id,
+        models.Orders.status == "pending",
+    ).first()
+
+    # If no active order exists, create one
+    if not order:
+        order = models.Orders(
+            user_id=user_id,
+            status="pending",
+            order_date=date.today(),
+            total_food_price=0,
+            delivery_fee=5000,  # Example delivery fee
+        )
+        db.add(order)
+        db.commit()
+        db.refresh(order)
+
+    # Check if the food item is already in the order
+    order_detail = db.query(models.OrderDetails).filter(
+        models.OrderDetails.order_id == order.order_id,
+        models.OrderDetails.food_id == cart_item.food_id,
+    ).first()
+
+    if order_detail:
+        # Update the quantity if the item is already in the cart
+        order_detail.quantity += cart_item.quantity
+    else:
+        # Add the food item to the order
+        new_order_detail = models.OrderDetails(
+            order_id=order.order_id,
+            food_id=cart_item.food_id,
+            quantity=cart_item.quantity,
+        )
+        db.add(new_order_detail)
+
+    # Update the total food price
+    food_item = db.query(models.FoodItem).filter(models.FoodItem.food_id == cart_item.food_id).first()
+    if not food_item:
+        raise HTTPException(status_code=404, detail="Food item not found")
+
+    order.total_food_price += food_item.price * cart_item.quantity
+
+    db.commit()
+    return {"message": "Item added to cart successfully"}
+
+# Define the request model for removing a cart item
+class RemoveFromCartRequest(BaseModel):
+    food_id: int
+    user_id: int
+
+@app.delete("/cart/remove", status_code=status.HTTP_200_OK)
+async def remove_from_cart(
+    cart_item: RemoveFromCartRequest,
+    db: Session = Depends(get_db),
+):
+    # Fetch the user's active order (status: "pending")
+    order = db.query(models.Orders).filter(
+        models.Orders.user_id == cart_item.user_id,
+        models.Orders.status == "pending",
+    ).first()
+
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No active order found."
+        )
+
+    # Check if the food item exists in the order
+    order_detail = db.query(models.OrderDetails).filter(
+        models.OrderDetails.order_id == order.order_id,
+        models.OrderDetails.food_id == cart_item.food_id,
+    ).first()
+
+    if not order_detail:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Food item not found in the cart."
+        )
+
+    # Update the total food price
+    food_item = db.query(models.FoodItem).filter(models.FoodItem.food_id == cart_item.food_id).first()
+    if not food_item:
+        raise HTTPException(status_code=404, detail="Food item not found")
+
+    # Decrease the quantity by 1
+    order_detail.quantity -= 1
+    order.total_food_price -= food_item.price
+
+    # If the quantity reaches zero, remove the item from the order details
+    if order_detail.quantity <= 0:
+        db.delete(order_detail)
+
+    # If the order is now empty, delete the order
+    remaining_items = db.query(models.OrderDetails).filter(
+        models.OrderDetails.order_id == order.order_id
+    ).count()
+
+    if remaining_items == 0:
+        db.delete(order)
+
+    db.commit()
+    return {"message": "Item quantity reduced in cart successfully"}
+
+@app.get("/cart", status_code=status.HTTP_200_OK)
+async def view_cart(
+    user_id: int,  # Ideally passed in via an authenticated session
+    db: Session = Depends(get_db),
+):
+    # Fetch the user's active order
+    order = db.query(models.Orders).filter(
+        models.Orders.user_id == user_id,
+        models.Orders.status == "pending",
+    ).first()
+
+    if not order:
+        return {"message": "Your cart is empty", "items": []}
+
+    # Fetch all items in the order
+    order_details = db.query(models.OrderDetails).filter(
+        models.OrderDetails.order_id == order.order_id
+    ).all()
+
+    cart_items = []
+    for detail in order_details:
+        food_item = db.query(models.FoodItem).filter(models.FoodItem.food_id == detail.food_id).first()
+        cart_items.append({
+            "food_id": detail.food_id,
+            "name": food_item.name,
+            "quantity": detail.quantity,
+            "price_per_item": food_item.price,
+            "total_price": food_item.price * detail.quantity,
+        })
+
+    return {
+        "order_id": order.order_id,
+        "items": cart_items,
+        "total_food_price": order.total_food_price,
+        "delivery_fee": order.delivery_fee,
+        "grand_total": order.total_food_price + order.delivery_fee,
+    }
+
+class OrderHistoryResponse(BaseModel):
+    order_id: int
+    order_date: date
+    total_food_price: int
+    delivery_fee: int
+    status: str
+    grand_total: int
+
+    class Config:
+        orm_mode = True
+
+@app.get("/orders/history", response_model=List[OrderHistoryResponse])
+async def get_order_history(user_id: int, db: Session = Depends(get_db)):
+    # Fetch the user's orders, sorted by order_date in descending order
+    orders = db.query(models.Orders).filter(
+        models.Orders.user_id == user_id
+    ).order_by(models.Orders.order_date.desc()).all()
+
+    if not orders:
+        return {"message": "No order history found", "orders": []}
+
+    # Prepare response with calculated grand_total for each order
+    order_history = []
+    for order in orders:
+        order_history.append({
+            "order_id": order.order_id,
+            "order_date": order.order_date,
+            "total_food_price": order.total_food_price,
+            "delivery_fee": order.delivery_fee,
+            "status": order.status,
+            "grand_total": order.total_food_price + order.delivery_fee,
+        })
+
+    return order_history
+
+@app.post("/orders/complete", status_code=status.HTTP_200_OK)
+async def complete_order(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    # Debug: Print user_id and database state
+    print(f"Completing order for user_id: {user_id}")
+    
+    # Check for active order
+    order = db.query(models.Orders).filter(
+        models.Orders.user_id == user_id,
+        models.Orders.status == "pending"
+    ).first()
+
+    if not order:
+        print("No active order found for user_id:", user_id)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No active order found."
+        )
+
+    # Update order status
+    order.status = "completed"
+    db.commit()
+
+    # Debug: Confirmation message for order completion
+    print(f"Order {order.order_id} marked as completed.")
+    return {"message": f"Order {order.order_id} has been successfully completed."}
